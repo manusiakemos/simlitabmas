@@ -29,6 +29,7 @@
             getData() {
                 this.axios.post('/api/dashboard/widget/pengabdian').then(res=>{
                     this.list = res.data;
+                    console.log(JSON.stringify(res.data));
                 });
             },
         },

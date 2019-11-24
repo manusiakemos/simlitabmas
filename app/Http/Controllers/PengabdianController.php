@@ -15,12 +15,21 @@ use Yajra\DataTables\DataTables;
 class PengabdianController extends Controller
 {
 
-    public function index()
+    private $type;
+
+    public function index(Request $request)
     {
         $data = Pengabdian::query()
             ->latest()
             ->with('status')
             ->with('files');
+        if($request->has('filter_tahun_cetak') && $request->filter_tahun_cetak){
+            $ss = SurveyStatus::findByLevel(2)->first();
+            $data = $data->where('penelitian_tahun_pelaksanaan', $request->filter_tahun_cetak)
+                ->where('ss_id', $ss->ss_id)
+                ->get();
+            return $data;
+        }
         return DataTables::of($data)
             ->addColumn('action', function ($value){
                 return view('components.action',[
@@ -52,6 +61,7 @@ class PengabdianController extends Controller
 
     public function store(Request $request)
     {
+        $this->type = 'store';
         $this->validate($request,[
             'penelitian_judul' => 'required',
             'penelitian_anggaran' => 'required',
@@ -73,6 +83,7 @@ class PengabdianController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->type = 'update';
         if(!$request->has('ss_level')){
             $this->validate($request,[
                 'penelitian_judul' => 'required',
@@ -93,9 +104,12 @@ class PengabdianController extends Controller
     {
         $role = auth()->user()->role;
         if($request->has('ss_level') && $request->ss_level !== null){
-            $status = SurveyStatus::findByLevel($request->ss_level)->first();
+            if($this->type == 'update' && $request->ss_level == 1){
+                $status = SurveyStatus::findByLevel(0)->first();
+            }else{
+                $status = SurveyStatus::findByLevel($request->ss_level)->first();
+            }
             $db->ss_id = $status->ss_id;
-
             if($role == 'admin'){
                 $user = User::find($db->user_id);
                 $user->notify(new Pemberitahuan($db->penelitian_judul .' ' . $status->ss_value,'pengabdian'));
@@ -103,18 +117,28 @@ class PengabdianController extends Controller
                 $users = User::where('role', '=', 'admin')->get();
                 Notification::send($users, new Pemberitahuan('Update pengabdian ' . $db->penelitan_judul, 'pengabdian'));
             }
+            return $db->save();
         }else{
             if($role == 'user'){
+                if ($this->type == 'store') {
+                    $status = SurveyStatus::findByLevel(1)->first();
+                }
+                if (isset($status)) {
+                    $db->ss_id = $status->ss_id;
+                }
                 $db->user_id = auth()->id();
+                $db->is_pengabdian = true;
+                $db->penelitian_anggaran = $request->penelitian_anggaran;
+                $db->pengabdian_tempat = $request->pengabdian_tempat;
+                $db->penelitian_judul = $request->penelitian_judul;
+                $db->penelitian_ringkasan = $request->penelitian_ringkasan;
+                $db->penelitian_tahun_pelaksanaan = $request->penelitian_tahun_pelaksanaan;
+            }else{
+                $status = SurveyStatus::findByLevel(0)->first();
+                if (isset($status)) {
+                    $db->ss_id = $status->ss_id;
+                }
             }
-            $status = SurveyStatus::findByLevel(1)->first();
-            $db->is_pengabdian = true;
-            $db->ss_id = $status->ss_id;
-            $db->penelitian_anggaran = $request->penelitian_anggaran;
-            $db->pengabdian_tempat = $request->pengabdian_tempat;
-            $db->penelitian_judul = $request->penelitian_judul;
-            $db->penelitian_ringkasan = $request->penelitian_ringkasan;
-            $db->penelitian_tahun_pelaksanaan = $request->penelitian_tahun_pelaksanaan;
         }
         return $db->save();
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\WidgetResource;
 use App\Models\Penelitian;
+use App\Models\Pengabdian;
 use App\Models\SurveyStatus;
 use App\Notifications\Pemberitahuan;
 use App\User;
@@ -33,20 +34,30 @@ class DashboardController extends Controller
 
     public function widget(Request $request, $type = 'penelitian')
     {
-        $total = Penelitian::count();
+        if($type == 'penelitian'){
+            $total = Penelitian::count();
 //            where('penelitian_tahun_pelaksanaan', date('Y'))
 //            ->orWhereNull('penelitian_tahun_pelaksanaan', date('Y'))
 //            ->count();
+            session()->put('total', $total);
 
-        session()->put('total', $total);
-
-        $data = Penelitian::selectRaw('count(*) as value, ss_value as label, ss_level as level')
-            ->join('status', 'status.ss_id', '=', 'penelitian.ss_id')
+            $data = Penelitian::selectRaw('count(*) as value, ss_value as label, ss_level as level')
+                ->join('status', 'status.ss_id', '=', 'penelitian.ss_id')
 //            ->where('penelitian_tahun_pelaksanaan', date('Y'))
 //            ->orWhereNull('penelitian_tahun_pelaksanaan', date('Y'))
-            ->groupBy('penelitian.ss_id');
-        if(isset($type) && $type == 'pengabdian'){
-            $data = $data->where('is_pengabdian', true);
+                ->groupBy('penelitian.ss_id');
+        }else{
+            $total = Pengabdian::count();
+//            where('penelitian_tahun_pelaksanaan', date('Y'))
+//            ->orWhereNull('penelitian_tahun_pelaksanaan', date('Y'))
+//            ->count();
+            session()->put('total', $total);
+
+            $data = Pengabdian::selectRaw('count(*) as value, ss_value as label, ss_level as level')
+                ->join('status', 'status.ss_id', '=', 'penelitian.ss_id')
+//            ->where('penelitian_tahun_pelaksanaan', date('Y'))
+//            ->orWhereNull('penelitian_tahun_pelaksanaan', date('Y'))
+                ->groupBy('penelitian.ss_id');
         }
         return WidgetResource::collection($data->get());
     }

@@ -14,6 +14,9 @@
                                     class="mb-3 shadow" type="primary" size="small" @click="create"
                                        icon="fa fa-plus"> Tambah Pengabdian
                             </el-button>
+                            <el-button class="mb-3 shadow" type="primary" size="small" @click="showModalPrint = true"
+                                       icon="fa fa-print"> Cetak Pengabdian
+                            </el-button>
                             <el-button class="mb-3 shadow" type="primary" size="small" @click="refreshDt"
                                        icon="fa fa-refresh"> Refresh
                             </el-button>
@@ -158,11 +161,56 @@
                     </div>
                 </template>
             </b-modal>
+            <!--Modal Print-->
+            <b-modal title="Cetak Penelitian Pertahun" size="sm" v-model="showModalPrint" @ok="showModalPrint = false">
+                <my-year-picker v-model="year"></my-year-picker>
+                <div class="text-center">
+                    <b-spinner variant="primary" label="Spinning" v-if="loading"></b-spinner>
+                </div>
+                <template v-slot:modal-footer>
+                    <div class="w-100">
+                        <div class="d-flex">
+                            <b-button
+                                    variant="secondary"
+                                    class="ml-auto"
+                                    @click="showModalPrint=false">
+                                Tutup
+                            </b-button>
+                            <b-button
+                                    variant="primary"
+                                    class="ml-1"
+                                    @click="print">
+                                Cetak
+                            </b-button>
+                        </div>
+                    </div>
+                </template>
+            </b-modal>
+            <!--print area-->
+            <div id="printMe" class="bg-white p-4 d-none d-print-block">
+                <h4 class="text-center mb-3">Pengabdian Tahun {{ year }}</h4>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th  v-for="(v, i) in configDt.columns" :key="i" v-if="v.printable">{{v.title}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, key) in list" :key="key">
+                        <td v-for="(v, i) in configDt.columns" :key="i" v-if="v.printable">
+                            <span v-if="v.title == 'Status'">{{item.status.ss_value}}</span>
+                            <span v-else v-html="item[v.data]"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+    var d = new Date();
     import DataTables from '../../components/base/DataTable';
     import MyEditor from "../../components/base/MyEditor";
     import MyMoney from "../../components/base/MyMoney";
@@ -217,15 +265,19 @@
                 configDt: {
                     url: "/api/pengabdian",
                     columns: [
-                        {title: "Pengabdian", data: "penelitian_judul", class: "all"},
-                        {title: "Anggaran", data: "penelitian_anggaran", class: "auto"},
-                        {title: "Tahun Pelaksanaan", data: "penelitian_tahun_pelaksanaan", class: "auto"},
-                        {title: "Status", data: "status.ss_value", class: "auto"},
-                        {title: "Ringkasan", data: "penelitian_ringkasan", class: "none"},
-                        {title: "Tempat", data: "pengabdian_tempat", class: "none"},
-                        {title: "Action", data: "action", class: "text-center w-25 all"}
+                        {title: "Pengabdian", data: "penelitian_judul", class: "all", printable:true},
+                        {title: "Anggaran", data: "penelitian_anggaran", class: "auto", printable:true},
+                        {title: "Tahun Pelaksanaan", data: "penelitian_tahun_pelaksanaan", class: "auto", printable:true},
+                        {title: "Status", data: "status.ss_value", class: "auto", printable:true},
+                        {title: "Ringkasan", data: "penelitian_ringkasan", class: "none", printable:true},
+                        {title: "Tempat", data: "pengabdian_tempat", class: "none", printable:true},
+                        {title: "Action", data: "action", class: "text-center w-25 all", printable:false}
                     ]
                 },
+                year: d.getFullYear(),
+                list:[],
+                loading: false,
+                showModalPrint: false,
             }
         },
         created() {
@@ -235,6 +287,23 @@
             this.setDt();
         },
         methods: {
+            print() {
+                this.loading = true;
+                this.axios.get(`/api/pengabdian?filter_tahun_cetak=${this.year}`).then(res=>{
+                    this.list = res.data;
+                    if(this.list.length > 0){
+                        this.$nextTick(()=>{
+                            this.showModalPrint = false;
+                            this.loading = false;
+                            var selector = 'printMe';
+                            this.$htmlToPaper(selector);
+                        });
+                    }else{
+                        this.loading = false;
+                        this.$message('data kosong');
+                    }
+                });
+            },
             setDt() {
                 var vm = this;
                 $(document).find("#dt-pengabdian")

@@ -97,18 +97,12 @@ Vue.use(ImageUploader)
 import VueHtmlToPaper from 'vue-html-to-paper';
 
 const options = {
-    name: '_blank',
-    specs: [
-        'fullscreen=yes',
-        'titlebar=yes',
-        'scrollbars=yes'
-    ],
     styles: [
-        'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
+        'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css',
     ]
 }
 
-Vue.use(VueHtmlToPaper);
+Vue.use(VueHtmlToPaper, options);
 
 /* eslint-disable no-new */
 new Vue({
