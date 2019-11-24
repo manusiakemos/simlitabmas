@@ -1,0 +1,44 @@
+<!--form group-->
+<b-form-group
+    id="username-group"
+    label="Username"
+    label-for="username"
+    :invalid-feedback="this.errors && this.errors.username ? this.errors.username.join() : ''"
+    :state="this.errors && this.errors.username ? false : true"
+>
+    <b-form-input id="username"
+                  v-model="data.data.username"
+    ></b-form-input>
+</b-form-group>
+
+<!--modal-->
+<b-modal :title="modal_title" size="lg" v-model="showModal" @ok="showModal = false">
+    <template v-slot:modal-footer>
+        <div class="w-100">
+            <div class="d-flex">
+                <b-button
+                    variant="secondary"
+                    class="ml-auto"
+                    @click="showModal=false"
+                >
+                    Tutup
+                </b-button>
+                <b-button v-if="action == 'store'"
+                          variant="primary"
+                          class="ml-1"
+                          @click="store"
+                >
+                    Simpan
+                </b-button>
+                <b-button v-else
+                          variant="primary"
+                          class="ml-1"
+                          @click="update"
+                >
+                    Simpan
+                </b-button>
+            </div>
+        </div>
+    </template>
+</b-modal>
+

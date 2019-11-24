@@ -1,0 +1,94 @@
+// Here you can add other styles
+td, p {
+    font-family: $font-family-secondary;
+}
+
+body {
+    //background: $white !important;
+    @include bg-gradient();
+}
+
+.app-header .navbar-toggler-icon {
+    //background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iMjQiIGhlaWdodD0iMjQiCnZpZXdCb3g9IjAgMCAxNzIgMTcyIgpzdHlsZT0iIGZpbGw6IzAwMDAwMDsiPjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHN0cm9rZS1kYXNoYXJyYXk9IiIgc3Ryb2tlLWRhc2hvZmZzZXQ9IjAiIGZvbnQtZmFtaWx5PSJub25lIiBmb250LXdlaWdodD0ibm9uZSIgZm9udC1zaXplPSJub25lIiB0ZXh0LWFuY2hvcj0ibm9uZSIgc3R5bGU9Im1peC1ibGVuZC1tb2RlOiBub3JtYWwiPjxwYXRoIGQ9Ik0wLDE3MnYtMTcyaDE3MnYxNzJ6IiBmaWxsPSJub25lIj48L3BhdGg+PGcgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTE0LjMzMzMzLDM1LjgzMzMzdjE0LjMzMzMzaDE0My4zMzMzM3YtMTQuMzMzMzN6TTE0LjMzMzMzLDc4LjgzMzMzdjE0LjMzMzMzaDE0My4zMzMzM3YtMTQuMzMzMzN6TTE0LjMzMzMzLDEyMS44MzMzM3YxNC4zMzMzM2gxNDMuMzMzMzN2LTE0LjMzMzMzeiI+PC9wYXRoPjwvZz48L2c+PC9zdmc+') 50% 50% no-repeat !important;
+    background-size: 100%;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    color: $white !important;
+    background: $sidebar !important;
+
+    .nav-link {
+        color: $white !important;
+    }
+    .nav-link:hover {
+        color: $white !important;
+    }
+
+    .nav-link.active {
+        color: $white !important;
+        background: lighten($sidebar, 15%) !important;
+        .nav-icon {
+            color: $secondary !important;
+        }
+    }
+
+    .nav-link.active:hover {
+        color: $white !important;
+        background: lighten($sidebar, 15%) !important;
+    }
+
+    .nav-title {
+        font-family: $font-family-secondary !important;
+        letter-spacing: 1px;
+    }
+
+    .nav-link.nav-link-primary {
+        color: $white !important;
+    }
+}
+
+.el-breadcrumb__item {
+    color: $white !important;
+    .el-breadcrumb__inner {
+        color: $white !important;
+    }
+}
+
+.item-container {
+    max-width: 80vw;
+    margin: 0;
+}
+
+.item {
+    padding: 1rem;
+    border: solid darken($primary, 3%) 1px;
+    border-collapse: collapse;
+    @include bg-gradient();
+}
+
+.item-sub {
+    margin: 0 0 0 2rem;
+}
+
+.el-upload-dragger {
+    background-color: #fff;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    box-sizing: border-box;
+    width: 130% !important;
+    height: 180px;
+    text-align: center;
+    position: relative;
+    overflow: hidden
+}
+
+.btn-primary, .btn-warning {
+    color: $white !important;
+}
+
+label{
+    text-transform: capitalize;
+}
