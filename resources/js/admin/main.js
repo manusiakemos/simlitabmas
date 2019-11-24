@@ -93,6 +93,23 @@ Vue.prototype.$prompt = MessageBox.prompt;
 import ImageUploader from 'vue-image-upload-resize'
 Vue.use(ImageUploader)
 
+
+import VueHtmlToPaper from 'vue-html-to-paper';
+
+const options = {
+    name: '_blank',
+    specs: [
+        'fullscreen=yes',
+        'titlebar=yes',
+        'scrollbars=yes'
+    ],
+    styles: [
+        'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
+    ]
+}
+
+Vue.use(VueHtmlToPaper);
+
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
