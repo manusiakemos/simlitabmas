@@ -34,6 +34,8 @@ class AnggotaController extends Controller
         $db = new Anggota;
         $db->is_anggota = 1;
         $db->name = $request->name;
+        $db->nip = $request->nip;
+        $db->jabatan = $request->jabatan;
         $db->phone = $request->phone;
         $db->alamat = $request->alamat;
         $db->username = Str::snake($request->name);
@@ -62,6 +64,8 @@ class AnggotaController extends Controller
         ]);
         $db = Anggota::find($id);
         $db->name = $request->name;
+        $db->nip = $request->nip;
+        $db->jabatan = $request->jabatan;
         $db->phone = $request->phone;
         $db->alamat = $request->alamat;
         $db->is_anggota = 1;

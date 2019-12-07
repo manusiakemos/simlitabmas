@@ -87,9 +87,25 @@
                     <!--endform-->
                 </div>
                 <div v-else-if="user.role == 'admin'">
-                    <b-form-checkbox v-model="acceptData" name="check-button" switch>
+                    <b-form-group label="Status">
+                        <b-form-radio v-model="acceptData" name="some-radios" :value="true">Diterima</b-form-radio>
+                        <b-form-radio v-model="acceptData" name="some-radios" :value="false">Ditolak</b-form-radio>
+                    </b-form-group>
+                  <!--  <b-form-checkbox v-model="acceptData" name="check-button" switch>
                         Status Penelitian <b>({{acceptData ? 'Diterima' : 'Ditolak'}})</b>
-                    </b-form-checkbox>
+                    </b-form-checkbox>-->
+
+                    <b-form-group v-if="acceptData == false"
+                            id="penelitian_alasan_ditolak-group"
+                            label="alasan ditolak"
+                            label-for="penelitian_alasan_ditolak"
+                            :invalid-feedback="this.errors && this.errors.penelitian_alasan_ditolak ? this.errors.penelitian_alasan_ditolak.join() : ''"
+                            :state="this.errors && this.errors.penelitian_alasan_ditolak ? false : true"
+                    >
+                        <my-editor id="penelitian_alasan_ditolak"
+                                   v-model="data.data.penelitian_alasan_ditolak"
+                        ></my-editor>
+                    </b-form-group>
                 </div>
                 <template v-slot:modal-footer>
                     <div class="w-100">
@@ -238,6 +254,7 @@
                         "penelitian_judul": "",
                         "penelitian_ringkasan": "",
                         "penelitian_tahun_pelaksanaan": "",
+                        "penelitian_alasan_ditolak": "",
                         "created_at": null,
                         "updated_at": null,
                         "deleted_at": null,
@@ -264,6 +281,7 @@
                         {title: "Tahun Pelaksanaan", data: "penelitian_tahun_pelaksanaan", class: "auto", printable:true},
                         {title: "Status", data: "status.ss_value", class: "auto", printable:true},
                         {title: "Ringkasan", data: "penelitian_ringkasan", class: "none", printable:true},
+                        {title: "Alasan(Jika Ditolak)", data: "penelitian_alasan_ditolak", class: "none", printable:false},
                         {title: "Action", data: "action", class: "text-center w-25 all", printable:false}
                     ]
                 },

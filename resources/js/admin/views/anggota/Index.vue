@@ -44,6 +44,32 @@
                 </b-form-group>
 
                 <b-form-group
+                        id="nip-group"
+                        label="nip"
+                        label-for="nip"
+                        :invalid-feedback="this.errors && this.errors.nip ? this.errors.nip.join() : ''"
+                        :state="this.errors && this.errors.nip ? false : true"
+                >
+                    <b-form-input id="nip"
+                                  autocomplete="nip"
+                                  v-model="data.data.nip"
+                    ></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                        id="jabatan-group"
+                        label="jabatan"
+                        label-for="jabatan"
+                        :invalid-feedback="this.errors && this.errors.jabatan ? this.errors.jabatan.join() : ''"
+                        :state="this.errors && this.errors.jabatan ? false : true"
+                >
+                    <b-form-input id="jabatan"
+                                  autocomplete="jabatan"
+                                  v-model="data.data.jabatan"
+                    ></b-form-input>
+                </b-form-group>
+
+                <b-form-group
                         id="phone-group"
                         label="telepon"
                         label-for="phone"

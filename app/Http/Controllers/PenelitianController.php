@@ -20,6 +20,7 @@ class PenelitianController extends Controller
 
     public function index(Request $request)
     {
+//        $ss = SurveyStatus::all();
         $data = Penelitian::query()
             ->latest()
             ->with('status')
@@ -35,7 +36,8 @@ class PenelitianController extends Controller
             ->addColumn('action', function ($value) {
                 return view('components.action', [
                     'name' => 'penelitian',
-                    'value' => $value
+                    'value' => $value,
+//                    'status' => $ss
                 ]);
             })
             ->editColumn('penelitian_anggaran', function ($value) {
@@ -84,7 +86,8 @@ class PenelitianController extends Controller
 
     public function edit($id)
     {
-        return new PenelitianResource(Penelitian::with('status')->find($id));
+        $data = Penelitian::with('status')->find($id);
+        return new PenelitianResource($data);
     }
 
     public function update(Request $request, $id)
@@ -120,6 +123,7 @@ class PenelitianController extends Controller
                 $status = SurveyStatus::findByLevel($request->ss_level)->first();
             }
             $db->ss_id = $status->ss_id;
+            $db->penelitian_alasan_ditolak = $request->penelitian_alasan_ditolak;
             if (isset($status)) {
                 $db->ss_id = $status->ss_id;
             }
@@ -146,6 +150,7 @@ class PenelitianController extends Controller
                 $db->penelitian_ringkasan = $request->penelitian_ringkasan;
                 $db->penelitian_tahun_pelaksanaan = $request->penelitian_tahun_pelaksanaan;
             }else{
+                $db->penelitian_alasan_ditolak = $request->penelitian_alasan_ditolak;
                 $status = SurveyStatus::findByLevel(0)->first();
                 if (isset($status)) {
                     $db->ss_id = $status->ss_id;

@@ -137,8 +137,10 @@
                     @if(count($value->files) > 0)
                         <a class="dropdown-item btn-upload"
                            href="{{ route('penelitian.edit', $value['penelitian_id']) }}">Proposal</a>
-                        <a class="dropdown-item btn-status"
-                           href="{{ route('penelitian.edit', $value['penelitian_id']) }}">Ubah Status</a>
+                        @if($value->status->ss_level < 2)
+                            <a class="dropdown-item btn-status"
+                               href="{{ route('penelitian.edit', $value['penelitian_id']) }}">Ubah Status</a>
+                        @endif
                     @else
                         <a class="dropdown-item">File belum diupload</a>
                     @endif
@@ -177,8 +179,10 @@
                     @if(count($value->files) > 0)
                         <a class="dropdown-item btn-upload"
                            href="{{ route('pengabdian.edit', $value['penelitian_id']) }}">Proposal</a>
-                        <a class="dropdown-item btn-status"
-                           href="{{ route('pengabdian.edit', $value['penelitian_id']) }}">Ubah Status</a>
+                        @if($value->status->ss_level < 2)
+                            <a class="dropdown-item btn-status"
+                               href="{{ route('pengabdian.edit', $value['penelitian_id']) }}">Ubah Status</a>
+                        @endif
                     @else
                         <a class="dropdown-item">File belum diupload</a>
                     @endif
