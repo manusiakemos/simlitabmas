@@ -16,7 +16,9 @@ class PenelitianResource extends JsonResource
     {
         return [
             'data' => parent::toArray($request),
-            'mod' => [],
+            'mod' => [
+                'anggaran' => rupiah($this->penelitian_anggaran)
+            ],
             'links' => generate_links('penelitian', $this->penelitian_id)
         ];
     }

@@ -22,8 +22,6 @@ class FileController extends Controller
         $this->validate($request,[
            'file_title' => [
                'required',
-               Rule::unique('files', 'file_title')
-                   ->ignore($id, 'file_id')
            ],
         ]);
         $db = FileModel::find($id);

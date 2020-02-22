@@ -91,6 +91,7 @@ Vue.prototype.$prompt = MessageBox.prompt;
 // Vue.use(MessageBox);
 
 import ImageUploader from 'vue-image-upload-resize'
+
 Vue.use(ImageUploader)
 
 
@@ -104,6 +105,19 @@ const options = {
 
 Vue.use(VueHtmlToPaper, options);
 
+import VueCurrencyInput from 'vue-currency-input'
+
+const pluginOptions = {
+    /* see config reference */
+    globalOptions: {
+        currency: {
+            prefix: 'Rp.'
+        },
+        precision:0,
+        "allow-negative":false,
+    }
+}
+Vue.use(VueCurrencyInput, pluginOptions)
 /* eslint-disable no-new */
 new Vue({
     el: '#app',

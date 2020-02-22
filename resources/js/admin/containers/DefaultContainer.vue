@@ -62,7 +62,7 @@
                 var items = [
                     {
                         title: true,
-                        name: role,
+                        name: this.$store.state.auth.data.username,
                         class: '',
                         wrapper: {
                             element: '',
@@ -83,10 +83,11 @@
             }
 // admin
             else if (role == 'admin') {
+                var name = 'Kepala Kantor'
                 var items = [
                     {
                         title: true,
-                        name: role,
+                        name: name,
                         class: 'text-white',
                         wrapper: {
                             element: '',
@@ -110,10 +111,11 @@
                     },
                 ];
             }else{
+                var name = 'Admin'
                 var items = [
                     {
                         title: true,
-                        name: role,
+                        name: name,
                         class: '',
                         wrapper: {
                             element: '',
@@ -136,7 +138,7 @@
                         icon: 'fa fa-certificate',
                     },
                     {
-                        name: 'Anggota',
+                        name: 'Pegawai',
                         url: '/anggota',
                         icon: 'fa fa-users',
                     },

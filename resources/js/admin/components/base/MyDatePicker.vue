@@ -1,11 +1,21 @@
 <template>
-    <money-input
+    <el-date-picker
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
             v-model="propModel"
-    />
-</template>
+            type="date"
+            placeholder="Pilih Tanggal">
+    </el-date-picker></template>
 <script>
     export default {
         props:['value'],
+        data () {
+            return {
+               config:{
+
+               }
+            };
+        },
         computed: {
             propModel: {
                 get() {

@@ -125,8 +125,8 @@
                 @if(auth()->user()->role == 'user')
                     <a class="dropdown-item btn-upload"
                        href="{{ route('penelitian.edit', $value['penelitian_id']) }}">Proposal</a>
-                    @if($value->status->ss_level == 2 && !isset($is_pengabdian))
-                        <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Anggota
+                    @if($value->status->ss_level == 2 || $value->status->ss_level == 1 && !isset($is_pengabdian))
+                        <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Daftar Anggota
                         </button>
                     @endif
                     <a class="dropdown-item btn-edit"
@@ -167,8 +167,8 @@
                 @if(auth()->user()->role == 'user')
                     <a class="dropdown-item btn-upload"
                        href="{{ route('pengabdian.edit', $value['penelitian_id']) }}">Proposal</a>
-                    @if($value->status->ss_level == 2 && !isset($is_pengabdian))
-                        <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Anggota
+                    @if($value->status->ss_level == 2 || $value->status->ss_level == 1 && !isset($is_pengabdian))
+                        <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Daftar Anggota
                         </button>
                     @endif
                     <a class="dropdown-item btn-edit"
@@ -190,7 +190,7 @@
             </div>
         </div>
     @else
-        <span class="badge badge-danger p-2">Penelitian Ditolak</span>
+        <span class="badge badge-danger p-2">Pengabdian Ditolak</span>
     @endif
     @break
     {{--pengabdian--}}

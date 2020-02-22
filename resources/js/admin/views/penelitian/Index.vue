@@ -11,7 +11,7 @@
                     <b-col cols="12">
                         <b-card>
                             <el-button v-if="user.role == 'user'"
-                                    class="mb-3 shadow" type="primary" size="small" @click="create"
+                                       class="mb-3 shadow" type="primary" size="small" @click="create"
                                        icon="fa fa-plus"> Tambah Penelitian
                             </el-button>
                             <el-button class="mb-3 shadow" type="primary" size="small" @click="showModalPrint = true"
@@ -34,7 +34,7 @@
 
             <!-- Modal Component -->
             <b-modal :title="modal_title" size="lg" v-model="showModal" @ok="showModal = false">
-               <!--user role-->
+                <!--user role-->
                 <div v-if="user.role == 'user'">
                     <!--my form-->
                     <b-form-group
@@ -50,15 +50,15 @@
                     </b-form-group>
 
                     <b-form-group
-                            id="penelitian_tahun_pelaksanaan-group"
-                            label="Tahun pelaksanaan"
-                            label-for="penelitian_tahun_pelaksanaan"
-                            :invalid-feedback="this.errors && this.errors.penelitian_tahun_pelaksanaan ? this.errors.penelitian_tahun_pelaksanaan.join() : ''"
-                            :state="this.errors && this.errors.penelitian_tahun_pelaksanaan ? false : true"
+                            id="penelitian_tanggal-group"
+                            label="Tanggal"
+                            label-for="penelitian_tanggal"
+                            :invalid-feedback="this.errors && this.errors.penelitian_tanggal ? this.errors.penelitian_tanggal.join() : ''"
+                            :state="this.errors && this.errors.penelitian_tanggal ? false : true"
                     >
-                        <my-year-picker id="penelitian_tahun_pelaksanaan"
-                                        v-model="data.data.penelitian_tahun_pelaksanaan"
-                        ></my-year-picker>
+                        <my-date-picker id="penelitian_tanggal"
+                                        v-model="data.data.penelitian_tanggal"
+                        ></my-date-picker>
                     </b-form-group>
 
                     <b-form-group
@@ -80,9 +80,41 @@
                             :invalid-feedback="this.errors && this.errors.penelitian_anggaran ? this.errors.penelitian_anggaran.join() : ''"
                             :state="this.errors && this.errors.penelitian_anggaran ? false : true"
                     >
-                        <my-money id="penelitian_anggaran"
-                                  v-model="data.data.penelitian_anggaran"
-                        ></my-money>
+                        <currency-input
+                                class="form-control"
+                                v-model="data.data.penelitian_anggaran"
+                        />
+                    </b-form-group>
+
+                    <!--tambah anggota-->
+                    <b-form-group
+                            v-for="(value, index) in anggota_id" :key="index"
+                            label="anggota"
+                            :id="`anggota-group-${index}`"
+                            :label-for="`anggota-group-${index}`">
+                        <b-row>
+                            <b-col cols="9">
+                                <el-select class="w-100"
+                                           v-model="anggota_id[index]">
+                                    <el-option v-for="item in anggota"
+                                               :key="item.name"
+                                               :disabled="anggota_id.includes(item.id)"
+                                               :label="item.name"
+                                               :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </b-col>
+                            <b-col cols="3">
+                                <div class="float-right">
+                                    <el-button size="medium" type="primary" @click="addAnggotaId"><span
+                                            class="fa fa-plus"></span></el-button>
+                                    <el-button size="medium" type="danger"
+                                               v-if="anggota_id.length > 1"
+                                               @click="removeAnggotaId(index)">
+                                        <span class="fa fa-minus"></span></el-button>
+                                </div>
+                            </b-col>
+                        </b-row>
                     </b-form-group>
                     <!--endform-->
                 </div>
@@ -91,20 +123,24 @@
                         <b-form-radio v-model="acceptData" name="some-radios" :value="true">Diterima</b-form-radio>
                         <b-form-radio v-model="acceptData" name="some-radios" :value="false">Ditolak</b-form-radio>
                     </b-form-group>
-                  <!--  <b-form-checkbox v-model="acceptData" name="check-button" switch>
-                        Status Penelitian <b>({{acceptData ? 'Diterima' : 'Ditolak'}})</b>
-                    </b-form-checkbox>-->
+                    <!--  <b-form-checkbox v-model="acceptData" name="check-button" switch>
+                          Status Penelitian <b>({{acceptData ? 'Diterima' : 'Ditolak'}})</b>
+                      </b-form-checkbox>-->
 
                     <b-form-group v-if="acceptData == false"
-                            id="penelitian_alasan_ditolak-group"
-                            label="alasan ditolak"
-                            label-for="penelitian_alasan_ditolak"
-                            :invalid-feedback="this.errors && this.errors.penelitian_alasan_ditolak ? this.errors.penelitian_alasan_ditolak.join() : ''"
-                            :state="this.errors && this.errors.penelitian_alasan_ditolak ? false : true"
+                                  id="penelitian_alasan_ditolak-group"
+                                  label="alasan ditolak"
+                                  label-for="penelitian_alasan_ditolak"
+                                  :invalid-feedback="this.errors && this.errors.penelitian_alasan_ditolak ? this.errors.penelitian_alasan_ditolak.join() : ''"
+                                  :state="this.errors && this.errors.penelitian_alasan_ditolak ? false : true"
                     >
-                        <my-editor id="penelitian_alasan_ditolak"
-                                   v-model="data.data.penelitian_alasan_ditolak"
-                        ></my-editor>
+                        <b-form-textarea
+                                id="textarea"
+                                v-model="data.data.penelitian_alasan_ditolak"
+                                placeholder="..."
+                                rows="3"
+                                max-rows="6"
+                        ></b-form-textarea>
                     </b-form-group>
                 </div>
                 <template v-slot:modal-footer>
@@ -199,7 +235,7 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th  v-for="(v, i) in configDt.columns" :key="i" v-if="v.printable">{{v.title}}</th>
+                        <th v-for="(v, i) in configDt.columns" :key="i" v-if="v.printable">{{v.title}}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -221,7 +257,7 @@
     import DataTables from '../../components/base/DataTable';
     import MyEditor from "../../components/base/MyEditor";
     import MyMoney from "../../components/base/MyMoney";
-    import MyYearPicker from "../../components/base/MyYearPicker";
+    import MyDatePicker from "../../components/base/MyDatePicker.vue";
 
     import Upload from "./Upload";
     import Widgets from "./Widgets";
@@ -233,25 +269,28 @@
             MyEditor,
             DataTables,
             MyMoney,
-            MyYearPicker,
+            MyDatePicker,
             Upload
         },
         data() {
             return {
                 action: 'store',
-                loading:false,
+                loading: false,
                 showModal: false,
                 showModalUpload: false,
                 showModalPrint: false,
                 modal_title: 'Tambah Penelitian',
                 uploadUrl: null,
                 year: d.getFullYear(),
+                anggota_id: ["",],
+                anggota: [],
                 data: {
                     "data": {
                         "penelitian_id": "",
                         "user_id": "",
-                        "penelitian_anggaran": "",
+                        "penelitian_anggaran": 0,
                         "penelitian_judul": "",
+                        "penelitian_tanggal": "",
                         "penelitian_ringkasan": "",
                         "penelitian_tahun_pelaksanaan": "",
                         "penelitian_alasan_ditolak": "",
@@ -272,24 +311,36 @@
                     }
                 },
                 data2: null,
-                errors: '',
+                errors: [],
                 configDt: {
                     url: "/api/penelitian",
                     columns: [
-                        {title: "Penelitian", data: "penelitian_judul", class: "all", printable:true},
-                        {title: "Anggaran", data: "penelitian_anggaran", class: "auto", printable:true},
-                        {title: "Tahun Pelaksanaan", data: "penelitian_tahun_pelaksanaan", class: "auto", printable:true},
-                        {title: "Status", data: "status.ss_value", class: "auto", printable:true},
-                        {title: "Ringkasan", data: "penelitian_ringkasan", class: "none", printable:true},
-                        {title: "Alasan(Jika Ditolak)", data: "penelitian_alasan_ditolak", class: "none", printable:false},
-                        {title: "Action", data: "action", class: "text-center w-25 all", printable:false}
+                        {title: "Penelitian", data: "penelitian_judul", class: "all", printable: true},
+                        {title: "Anggaran", data: "penelitian_anggaran", class: "auto", printable: true},
+                        {
+                            title: "Tanggal",
+                            data: "penelitian_tanggal",
+                            class: "auto",
+                            printable: true
+                        },
+                        {title: "Status", data: "status.ss_value", class: "auto", printable: true},
+                        {title: "Ringkasan", data: "penelitian_ringkasan", class: "none", printable: true},
+                        {
+                            title: "Alasan(Jika Ditolak)",
+                            data: "penelitian_alasan_ditolak",
+                            class: "none",
+                            printable: false
+                        },
+                        {title: "Action", data: "action", class: "text-center w-25 all", printable: false}
                     ]
                 },
-                list:[]
+                list: [],
+                showSelect: false,
             }
         },
         created() {
             this.data2 = this.data;
+            this.getData();
         },
         mounted() {
             this.setDt();
@@ -311,7 +362,7 @@
                     .on("click", ".btn-anggota", function (e) {
                         e.preventDefault();
                         var id = $(this).data('id');
-                        vm.$router.push({path:`/penelitian/anggota/${id}`});
+                        vm.$router.push({path: `/penelitian/anggota/${id}`});
                     })
                     .on("click", ".btn-edit", function (e) {
                         e.preventDefault();
@@ -328,17 +379,24 @@
                 this.$refs.dt.refresh();
             },
             create() {
+                this.anggota_id = [""];
                 this.data = _.cloneDeep(this.data2);
                 this.action = 'store';
                 this.modal_title = 'Tambah Penelitian';
                 this.showModal = true;
             },
             edit(url) {
+                this.anggota_id = [];
+                this.showSelect = false;
                 this.modal_title = 'Edit Penelitian';
                 this.action = 'update';
                 this.axios.get(url).then(res => {
                     this.data = _.cloneDeep(res.data);
+                    res.data.data.penelitian_anggota.forEach(v=>{
+                        this.anggota_id.push(v.anggota_id);
+                    });
                 });
+                this.showSelect = true;
                 this.showModal = true;
             },
             updateStatus(url) {
@@ -350,7 +408,13 @@
                 this.showModal = true;
             },
             store() {
-                this.axios.post('/api/penelitian', this.data.data).then(res => {
+                this.axios.post('/api/penelitian', {
+                    penelitian_judul: this.data.data.penelitian_judul,
+                    penelitian_anggaran: this.data.data.penelitian_anggaran,
+                    penelitian_ringkasan: this.data.data.penelitian_ringkasan,
+                    penelitian_tanggal: this.data.data.penelitian_tanggal,
+                    anggota_id: this.anggota_id
+                }).then(res => {
                     if (res.data.status) {
                         this.$message({
                             message: res.data.message,
@@ -366,7 +430,13 @@
                 });
             },
             update() {
-                this.axios.put(this.data.links.update, this.data.data).then(res => {
+                this.axios.put(this.data.links.update, {
+                    penelitian_judul: this.data.data.penelitian_judul,
+                    penelitian_anggaran: this.data.data.penelitian_anggaran,
+                    penelitian_ringkasan: this.data.data.penelitian_ringkasan,
+                    penelitian_tanggal: this.data.data.penelitian_tanggal,
+                    anggota_id: this.anggota_id
+                }).then(res => {
                     if (res.data.status) {
                         this.$message({
                             message: res.data.message,
@@ -383,7 +453,8 @@
             },
             updateStatusAjax() {
                 this.axios.put(this.data.links.update, {
-                    'ss_level' : this.data.data.status.ss_level
+                    'ss_level': this.data.data.status.ss_level,
+                    'penelitian_alasan_ditolak': this.data.data.penelitian_alasan_ditolak
                 }).then(res => {
                     if (res.data.status) {
                         this.$message({
@@ -433,34 +504,51 @@
             },
             print() {
                 this.loading = true;
-                this.axios.get(`/api/penelitian?filter_tahun_cetak=${this.year}`).then(res=>{
+                this.axios.get(`/api/penelitian?filter_tahun_cetak=${this.year}`).then(res => {
                     this.list = res.data;
-                    if(this.list.length > 0){
-                        this.$nextTick(()=>{
+                    if (this.list.length > 0) {
+                        this.$nextTick(() => {
                             this.showModalPrint = false;
                             this.loading = false;
                             var selector = 'printMe';
                             this.$htmlToPaper(selector);
                         });
-                    }else{
+                    } else {
                         this.loading = false;
                         this.$message('data kosong');
                     }
                 });
             },
+            getData() {
+                this.showSelect = false;
+                this.axios.post('/api/select-options/anggota', {
+                    anggota: this.anggota_id
+                }).then(res => {
+                    this.anggota = res.data;
+                    this.showSelect = true;
+                });
+            },
+            addAnggotaId() {
+                this.anggota_id.push("");
+                // this.getData()
+            },
+            removeAnggotaId(index) {
+                this.anggota_id.splice(index, 1);
+                // this.getData();
+            },
         },
-        computed:{
-            user(){
+        computed: {
+            user() {
                 return this.$store.state.auth.data;
             },
-            setRefresh(){
-              return this.$store.state.refresh;
+            setRefresh() {
+                return this.$store.state.refresh;
             },
-            acceptData:{
+            acceptData: {
                 get: function () {
                     if (this.data.data.status.ss_level <= 1) {
                         return false;
-                    } else if(this.data.data.status.ss_level == 2){
+                    } else if (this.data.data.status.ss_level == 2) {
                         return true;
                     }
                 },

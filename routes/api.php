@@ -11,7 +11,7 @@ Route::post('login', 'AuthController@login');
 
 Route::middleware(['auth:api'])->group(function(){
     //core
-    Route::get('select-options/{type}', 'SelectOptionsController@index');
+    Route::any('select-options/{type}', 'SelectOptionsController@index');
 
     Route::get('profile', 'ProfileController@edit')->name('profile.edit');
     Route::put('profile', 'ProfileController@update')->name('profile.update');
@@ -28,10 +28,12 @@ Route::middleware(['auth:api'])->group(function(){
 
     Route::get('file-download/{id}', 'FileController@download')->name('file.download');
     Route::resource('file', 'FileController');
-    
+
     Route::post('penelitian/{id}/upload','PenelitianController@upload')->name('penelitian.upload');
+    Route::get('penelitian/detail/{ss_id}', 'PenelitianController@showDetail');
     Route::resource('penelitian', 'PenelitianController');
 
+    Route::get('pengabdian/detail/{ss_id}', 'PengabdianController@showDetail');
     Route::resource('pengabdian', 'PengabdianController');
 
     Route::resource('anggota', 'AnggotaController');

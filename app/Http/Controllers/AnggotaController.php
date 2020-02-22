@@ -32,14 +32,14 @@ class AnggotaController extends Controller
            'alamat' => 'required',
         ]);
         $db = new Anggota;
-        $db->is_anggota = 1;
+//        $db->is_anggota = 1;
         $db->name = $request->name;
         $db->nip = $request->nip;
         $db->jabatan = $request->jabatan;
         $db->phone = $request->phone;
         $db->alamat = $request->alamat;
-        $db->username = Str::snake($request->name);
-        $db->api_token = Str::random().'anggota';
+//        $db->username = Str::snake($request->name);
+//        $db->api_token = Str::random().'anggota';
         return $db->save()
             ? responseJson('Anggota berhasil ditambahkan')
             : responseJson('Anggota gagal ditambahkan', '', 500);
@@ -68,7 +68,7 @@ class AnggotaController extends Controller
         $db->jabatan = $request->jabatan;
         $db->phone = $request->phone;
         $db->alamat = $request->alamat;
-        $db->is_anggota = 1;
+//        $db->is_anggota = 1;
         return $db->save()
             ? responseJson('Anggota berhasil diupdate')
             : responseJson('Anggota gagal diupdate', '', 500);

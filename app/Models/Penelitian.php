@@ -29,6 +29,11 @@ class Penelitian extends Model
         return $this->belongsTo(User::class,'user_id', 'id');
     }
 
+    public function penelitian_anggota()
+    {
+        return $this->hasMany(PenelitianAnggota::class,'penelitian_id');
+    }
+
     public function files()
     {
         return $this->hasMany(FileModel::class, $this->primaryKey);

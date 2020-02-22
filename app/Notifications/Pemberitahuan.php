@@ -12,16 +12,18 @@ class Pemberitahuan extends Notification
     use Queueable;
     public $message;
     public $type;
+    public $id;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($message, $type='penelitian')
+    public function __construct($message, $type='penelitian', $id)
     {
         $this->message = $message;
         $this->type = $type;
+        $this->id = $id;
     }
 
     /**
@@ -41,6 +43,7 @@ class Pemberitahuan extends Notification
         return [
             'message' => $this->message,
             'type' => $this->type,
+            'id' => $this->id,
         ];
     }
 }

@@ -15,5 +15,11 @@ class FileModel extends Model
         return $query->where('penelitian_id', $id);
     }
 
+    public function scopefindByPengabdianId($query, $id)
+    {
+        return $query->where('penelitian_id', $id);
+    }
+
+
     use SoftDeletes;
 }

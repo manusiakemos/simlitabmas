@@ -11,6 +11,7 @@ class WidgetResource extends JsonResource
     {
         $total  = session()->get('total');
         return [
+            'ss_id' => $this->ss_id,
             'label' => $this->label,
             'value' => $this->value,
             'total' => $total,
