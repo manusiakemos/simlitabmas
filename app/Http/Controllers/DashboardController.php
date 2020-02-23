@@ -39,7 +39,10 @@ class DashboardController extends Controller
 
     public function widget(Request $request, $type = 'penelitian')
     {
-        $db = $type == 'penelitian' ? Penelitian::query() : Pengabdian::query();
+        $db = Penelitian::query();
+        $db = $type == 'penelitian'
+            ? $db->where('is_pengabdian', false)
+            : $db->where('is_pengabdian', true);
         $total = $db->count();
 //            where('penelitian_tahun_pelaksanaan', date('Y'))
 //            ->orWhereNull('penelitian_tahun_pelaksanaan', date('Y'))

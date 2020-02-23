@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PengabdianResource;
+use App\Http\Resources\PenelitianResource;
 use App\Models\FileModel;
-use App\Models\PengabdianAnggota;
+use App\Models\Penelitian;
+use App\Models\PenelitianAnggota;
+use App\Http\Resources\PengabdianResource;
 use App\Models\Pengabdian;
 use App\Models\SurveyStatus;
 use App\Notifications\Pemberitahuan;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -18,12 +21,15 @@ use Yajra\DataTables\DataTables;
 class PengabdianController extends Controller
 {
 
+    private $is_pengabdian = true;
+
     public function index(Request $request)
     {
-        $data = Pengabdian::query()
+//        $ss = SurveyStatus::all();
+        $data = Penelitian::query()
             ->latest()
-            ->with('status')
-            ->with('files');
+            ->where('is_pengabdian', $this->is_pengabdian)
+            ->with(['status','files']);
         if ($request->has('filter_tahun_cetak') && $request->filter_tahun_cetak) {
             $ss = SurveyStatus::findByLevel(2)->first();
             $data = $data->where('penelitian_tahun_pelaksanaan', $request->filter_tahun_cetak)
@@ -62,10 +68,10 @@ class PengabdianController extends Controller
             'penelitian_judul' => 'required',
             'penelitian_anggaran' => 'required',
             'penelitian_ringkasan' => 'required',
-            'penelitian_tahun_pelaksanaan' => 'required',
+            'penelitian_tanggal' => 'required',
             'anggota_id.*' => 'required|distinct'
         ]);
-        $db = new Pengabdian;
+        $db = new Penelitian;
         $save = $this->handleRequest($db, $request, 'store');
         if ($save) {
             $insertData = [];
@@ -76,30 +82,31 @@ class PengabdianController extends Controller
                     'created_at' => now()
                 ];
             }
-            PengabdianAnggota::insert($insertData);
+            PenelitianAnggota::insert($insertData);
             $role = auth()->user()->role;
             if ($role == 'user') {
                 $users = User::where('role', '=', 'admin')->get();
-                Notification::send($users, new Pemberitahuan('Pengabdian baru ' . $db->penelitian_judul));
+                Notification::send($users, new Pemberitahuan('Penelitian baru ' . $save->penelitian_judul, 'penelitian',  $save->penelitian_id));
             }
-            return responseJson('Pengabdian berhasil ditambahkan');
+            return responseJson('Pengabdian  berhasil ditambahkan');
         }
     }
 
 
     public function showDetail($status)
     {
-        return PengabdianResource::collection(Pengabdian::where('ss_id', $status)->get());
+        $data = Penelitian::where('ss_id', $status)->where('is_pengabdian', $this->is_pengabdian)->get();
+        return PenelitianResource::collection($data);
     }
 
 
     /**
      * @param $id
-     * @return PengabdianResource
+     * @return PenelitianResource
      */
     public function edit($id)
     {
-        $data = Pengabdian::with(['status'])->find($id);
+        $data = Penelitian::with(['status', 'penelitian_anggota', 'penelitian_anggota.anggota'])->find($id);
         return new PengabdianResource($data);
     }
 
@@ -119,10 +126,22 @@ class PengabdianController extends Controller
             ]);
         }
 
-        $db = Pengabdian::find($id);
+        $db = Penelitian::find($id);
         $save = $this->handleRequest($db, $request, 'update');
-        if ($save) {
-            return responseJson('Pengabdian berhasil diupdate');
+        if(auth()->user()->role == 'user'){
+            if ($save) {
+                $insertData = [];
+                foreach ($request->anggota_id as $item) {
+                    $insertData[] = [
+                        'anggota_id' => $item,
+                        'penelitian_id' => $save->penelitian_id,
+                        'created_at' => now()
+                    ];
+                }
+                PenelitianAnggota::where('penelitian_id', $db->penelitian_id)->delete();
+                PenelitianAnggota::insert($insertData);
+                return responseJson('Pengabdian  berhasil diupdate');
+            }
         }
     }
 
@@ -132,8 +151,8 @@ class PengabdianController extends Controller
      */
     public function destroy($id)
     {
-        Pengabdian::destroy($id);
-        return responseJson('Pengabdian berhasil dihapus');
+        Penelitian::destroy($id);
+        return responseJson('Pengabdian  berhasil dihapus');
     }
 
     /**
@@ -159,10 +178,10 @@ class PengabdianController extends Controller
 
             if ($role == 'admin') {
                 $user = User::find($db->user_id);
-                $user->notify(new Pemberitahuan($db->penelitian_judul . ' ' . $status->ss_value));
+                $user->notify(new Pemberitahuan($db->penelitian_judul . ' ' . $status->ss_value, 'penelitian', $db->penelitian_id) );
             } else {
                 $users = User::where('role', '=', 'admin')->get();
-                Notification::send($users, new Pemberitahuan('Update penelitian ' . $db->penelitan_judul));
+                Notification::send($users, new Pemberitahuan('Update penelitian ' . $db->penelitan_judul, 'penelitian', $db->penelitian_id));
             }
             return $db->save();
         } else {
@@ -177,9 +196,11 @@ class PengabdianController extends Controller
                 $db->penelitian_anggaran = $request->penelitian_anggaran;
                 $db->penelitian_judul = $request->penelitian_judul;
                 $db->penelitian_ringkasan = $request->penelitian_ringkasan;
-                $db->is_pengabdian = 1;
+                $db->penelitian_tanggal = $request->penelitian_tanggal;
                 $db->pengabdian_tempat = $request->pengabdian_tempat;
-                $db->penelitian_tahun_pelaksanaan = $request->penelitian_tahun_pelaksanaan;
+                $db->is_pengabdian = $this->is_pengabdian;
+                $dt = Carbon::parse($request->penelitian_tahun_pelaksanaan);
+                $db->penelitian_tahun_pelaksanaan = $dt->year;
             } else {
                 $db->penelitian_alasan_ditolak = $request->penelitian_alasan_ditolak;
                 $status = SurveyStatus::findByLevel(0)->first();
@@ -201,8 +222,8 @@ class PengabdianController extends Controller
     public function upload(Request $request, $id)
     {
         $type = 'penelitian';
-        $penelitian = Pengabdian::find($id);
-        if (!$penelitian) {
+        $penelitian = Penelitian::find($id);
+        if ($penelitian->is_pengabdian == 1) {
             $type = 'pengabdian';
             $penelitian = Pengabdian::find($id);
         }
@@ -212,7 +233,7 @@ class PengabdianController extends Controller
         ]);
 
         $file = $request->file('file');
-        $db = FileModel::findByPengabdianId($penelitian->penelitian_id)->first();
+        $db = FileModel::findByPenelitianId($penelitian->penelitian_id)->first();
         if (!$db) {
             $db = new FileModel();
         } else {
@@ -236,10 +257,10 @@ class PengabdianController extends Controller
             $role = auth()->user()->role;
             if ($role == 'admin') {
                 $user = User::find($penelitian->user_id);
-                $user->notify(new Pemberitahuan('Update file', "$type"));
+                $user->notify(new Pemberitahuan('Update file', "$type", $db->penelitian_id));
             } else {
                 $users = User::where('role', '=', 'admin')->get();
-                Notification::send($users, new Pemberitahuan('Update file ' . "$type" . ' ' . $penelitian->penelitian_judul, "$type"));
+                Notification::send($users, new Pemberitahuan('Update file ' . "$type" . ' ' . $penelitian->penelitian_judul, "$type", $db->penelitian_id));
             }
             return responseJson("File berhasil diupload", "", true, "success");
         }

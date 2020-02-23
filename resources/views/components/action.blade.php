@@ -121,13 +121,14 @@
                 Action
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="{{ $value['penelitian_id'] }}">
-
+                <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Detail
+                </button>
                 @if(auth()->user()->role == 'user')
                     <a class="dropdown-item btn-upload"
                        href="{{ route('penelitian.edit', $value['penelitian_id']) }}">Proposal</a>
                     @if($value->status->ss_level == 2 || $value->status->ss_level == 1 && !isset($is_pengabdian))
-                        <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Daftar Anggota
-                        </button>
+                       {{-- <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Daftar Anggota
+                        </button>--}}
                     @endif
                     <a class="dropdown-item btn-edit"
                        href="{{ route('penelitian.edit', $value['penelitian_id']) }}">Edit</a>
@@ -167,9 +168,11 @@
                 @if(auth()->user()->role == 'user')
                     <a class="dropdown-item btn-upload"
                        href="{{ route('pengabdian.edit', $value['penelitian_id']) }}">Proposal</a>
+                    <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Detail
+                    </button>
                     @if($value->status->ss_level == 2 || $value->status->ss_level == 1 && !isset($is_pengabdian))
-                        <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Daftar Anggota
-                        </button>
+                       {{-- <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Detail
+                        </button>--}}
                     @endif
                     <a class="dropdown-item btn-edit"
                        href="{{ route('pengabdian.edit', $value['penelitian_id']) }}">Edit</a>

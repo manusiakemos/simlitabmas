@@ -70,12 +70,11 @@ const routes = [
                 }
             },
             {
-                path: 'penelitian/anggota/:penelitian_id',
+                path: 'detail/:type/:penelitian_id',
                 name: 'PenelitianAnggota',
                 component: PenelitianAnggota,
                 meta: {
                     requiresAuth: true,
-                    role:'user'
                 }
             },
             {

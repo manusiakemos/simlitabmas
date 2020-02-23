@@ -258,6 +258,7 @@
     import MyEditor from "../../components/base/MyEditor";
     import MyMoney from "../../components/base/MyMoney";
     import MyDatePicker from "../../components/base/MyDatePicker.vue";
+    import MyYearPicker from "../../components/base/MyYearPicker.vue";
 
     import Upload from "./Upload";
     import Widgets from "./Widgets";
@@ -270,6 +271,7 @@
             DataTables,
             MyMoney,
             MyDatePicker,
+            MyYearPicker,
             Upload
         },
         data() {
@@ -362,7 +364,8 @@
                     .on("click", ".btn-anggota", function (e) {
                         e.preventDefault();
                         var id = $(this).data('id');
-                        vm.$router.push({path: `/penelitian/anggota/${id}`});
+                        // vm.$router.push({path: `/penelitian/anggota/${id}`});
+                        vm.$router.push({path: `detail/penelitian/${id}`});
                     })
                     .on("click", ".btn-edit", function (e) {
                         e.preventDefault();

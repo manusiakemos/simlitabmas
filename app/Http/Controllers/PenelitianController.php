@@ -27,8 +27,8 @@ class PenelitianController extends Controller
 //        $ss = SurveyStatus::all();
         $data = Penelitian::query()
             ->latest()
-            ->with('status')
-            ->with('files');
+            ->where('is_pengabdian', $this->is_pengabdian)
+            ->with(['status','files']);
         if ($request->has('filter_tahun_cetak') && $request->filter_tahun_cetak) {
             $ss = SurveyStatus::findByLevel(2)->first();
             $data = $data->where('penelitian_tahun_pelaksanaan', $request->filter_tahun_cetak)
@@ -85,7 +85,7 @@ class PenelitianController extends Controller
             $role = auth()->user()->role;
             if ($role == 'user') {
                 $users = User::where('role', '=', 'admin')->get();
-                Notification::send($users, new Pemberitahuan('Penelitian baru ' . $db->penelitian_judul));
+                Notification::send($users, new Pemberitahuan('Penelitian baru ' . $save->penelitian_judul, 'penelitian',  $save->penelitian_id));
             }
             return responseJson('Penelitian berhasil ditambahkan');
         }
@@ -94,7 +94,8 @@ class PenelitianController extends Controller
 
     public function showDetail($status)
     {
-        return PenelitianResource::collection(Penelitian::where('ss_id', $status)->get());
+        $data = Penelitian::where('ss_id', $status)->where('is_pengabdian', $this->is_pengabdian)->get();
+        return PenelitianResource::collection($data);
     }
 
 
@@ -127,16 +128,18 @@ class PenelitianController extends Controller
         $db = Penelitian::find($id);
         $save = $this->handleRequest($db, $request, 'update');
         if ($save) {
-            $insertData = [];
-            foreach ($request->anggota_id as $item) {
-                $insertData[] = [
-                    'anggota_id' => $item,
-                    'penelitian_id' => $save->penelitian_id,
-                    'created_at' => now()
-                ];
+            if(auth()->user()->role == 'user') {
+                $insertData = [];
+                foreach ($request->anggota_id as $item) {
+                    $insertData[] = [
+                        'anggota_id' => $item,
+                        'penelitian_id' => $save->penelitian_id,
+                        'created_at' => now()
+                    ];
+                }
+                PenelitianAnggota::where('penelitian_id', $db->penelitian_id)->delete();
+                PenelitianAnggota::insert($insertData);
             }
-            PenelitianAnggota::where('penelitian_id', $db->penelitian_id)->delete();
-            PenelitianAnggota::insert($insertData);
             return responseJson('Penelitian berhasil diupdate');
         }
     }
@@ -174,10 +177,10 @@ class PenelitianController extends Controller
 
             if ($role == 'admin') {
                 $user = User::find($db->user_id);
-                $user->notify(new Pemberitahuan($db->penelitian_judul . ' ' . $status->ss_value, 'penelitian', $this->penelitian_id) );
+                $user->notify(new Pemberitahuan($db->penelitian_judul . ' ' . $status->ss_value, 'penelitian', $db->penelitian_id) );
             } else {
                 $users = User::where('role', '=', 'admin')->get();
-                Notification::send($users, new Pemberitahuan('Update penelitian ' . $db->penelitan_judul, 'penelitian', $this->penelitian_id));
+                Notification::send($users, new Pemberitahuan('Update penelitian ' . $db->penelitan_judul, 'penelitian', $db->penelitian_id));
             }
             return $db->save();
         } else {
@@ -252,10 +255,10 @@ class PenelitianController extends Controller
             $role = auth()->user()->role;
             if ($role == 'admin') {
                 $user = User::find($penelitian->user_id);
-                $user->notify(new Pemberitahuan('Update file', "$type"));
+                $user->notify(new Pemberitahuan('Update file', "$type", $db->penelitian_id));
             } else {
                 $users = User::where('role', '=', 'admin')->get();
-                Notification::send($users, new Pemberitahuan('Update file ' . "$type" . ' ' . $penelitian->penelitian_judul, "$type"));
+                Notification::send($users, new Pemberitahuan('Update file ' . "$type" . ' ' . $penelitian->penelitian_judul, "$type", $db->penelitian_id));
             }
             return responseJson("File berhasil diupload", "", true, "success");
         }

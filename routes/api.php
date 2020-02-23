@@ -33,6 +33,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('penelitian/detail/{ss_id}', 'PenelitianController@showDetail');
     Route::resource('penelitian', 'PenelitianController');
 
+    Route::post('pengabdian/{id}/upload','PengabdianController@upload')->name('pengabdian.upload');
     Route::get('pengabdian/detail/{ss_id}', 'PengabdianController@showDetail');
     Route::resource('pengabdian', 'PengabdianController');
 

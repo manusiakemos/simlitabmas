@@ -50,27 +50,15 @@
                     </b-form-group>
 
                     <b-form-group
-                            id="pengabdian_tempat-group"
-                            label="tempat"
-                            label-for="pengabdian_tempat"
-                            :invalid-feedback="this.errors && this.errors.pengabdian_tempat ? this.errors.pengabdian_tempat.join() : ''"
-                            :state="this.errors && this.errors.pengabdian_tempat ? false : true"
+                            id="penelitian_tanggal-group"
+                            label="Tanggal"
+                            label-for="penelitian_tanggal"
+                            :invalid-feedback="this.errors && this.errors.penelitian_tanggal ? this.errors.penelitian_tanggal.join() : ''"
+                            :state="this.errors && this.errors.penelitian_tanggal ? false : true"
                     >
-                        <b-form-input id="pengabdian_tempat"
-                                      v-model="data.data.pengabdian_tempat"
-                        ></b-form-input>
-                    </b-form-group>
-
-                    <b-form-group
-                            id="penelitian_tahun_pelaksanaan-group"
-                            label="Tahun pelaksanaan"
-                            label-for="penelitian_tahun_pelaksanaan"
-                            :invalid-feedback="this.errors && this.errors.penelitian_tahun_pelaksanaan ? this.errors.penelitian_tahun_pelaksanaan.join() : ''"
-                            :state="this.errors && this.errors.penelitian_tahun_pelaksanaan ? false : true"
-                    >
-                        <my-year-picker id="penelitian_tahun_pelaksanaan"
-                                        v-model="data.data.penelitian_tahun_pelaksanaan"
-                        ></my-year-picker>
+                        <my-date-picker id="penelitian_tanggal"
+                                        v-model="data.data.penelitian_tanggal"
+                        ></my-date-picker>
                     </b-form-group>
 
                     <b-form-group
@@ -98,10 +86,21 @@
                         />
                     </b-form-group>
 
+                    <b-form-group
+                            id="pengabdian_tempat-group"
+                            label="tempat"
+                            label-for="pengabdian_tempat"
+                            :invalid-feedback="this.errors && this.errors.pengabdian_tempat ? this.errors.pengabdian_tempat.join() : ''"
+                            :state="this.errors && this.errors.pengabdian_tempat ? false : true"
+                    >
+                        <b-form-input id="pengabdian_tempat"
+                                      v-model="data.data.pengabdian_tempat"
+                        ></b-form-input>
+                    </b-form-group>
+
                     <!--tambah anggota-->
                     <b-form-group
-                            v-if="action=='store'"
-                            v-for="(item, index) in anggota_id" :key="index"
+                            v-for="(value, index) in anggota_id" :key="index"
                             label="anggota"
                             :id="`anggota-group-${index}`"
                             :label-for="`anggota-group-${index}`">
@@ -110,7 +109,8 @@
                                 <el-select class="w-100"
                                            v-model="anggota_id[index]">
                                     <el-option v-for="item in anggota"
-                                               :key="item.id"
+                                               :key="item.name"
+                                               :disabled="anggota_id.includes(item.id)"
                                                :label="item.name"
                                                :value="item.id">
                                     </el-option>
@@ -269,18 +269,20 @@
     import DataTables from '../../components/base/DataTable';
     import MyEditor from "../../components/base/MyEditor";
     import MyMoney from "../../components/base/MyMoney";
-    import MyYearPicker from "../../components/base/MyYearPicker";
+    import MyDatePicker from "../../components/base/MyDatePicker.vue";
+    import MyYearPicker from "../../components/base/MyYearPicker.vue";
 
     import Upload from "./Upload";
     import Widgets from "./Widgets";
 
     export default {
-        name: 'pengabdian',
+        name: 'penelitians',
         components: {
             Widgets,
             MyEditor,
             DataTables,
             MyMoney,
+            MyDatePicker,
             MyYearPicker,
             Upload
         },
@@ -294,7 +296,7 @@
                 modal_title: 'Tambah Pengabdian',
                 uploadUrl: null,
                 year: d.getFullYear(),
-                anggota_id: [],
+                anggota_id: ["",],
                 anggota: [],
                 data: {
                     "data": {
@@ -302,10 +304,11 @@
                         "user_id": "",
                         "penelitian_anggaran": 0,
                         "penelitian_judul": "",
+                        "penelitian_tanggal": "",
                         "penelitian_ringkasan": "",
-                        "pengabdian_tempat": "",
                         "penelitian_tahun_pelaksanaan": "",
                         "penelitian_alasan_ditolak": "",
+                        "pengabdian_tempat" : "",
                         "created_at": null,
                         "updated_at": null,
                         "deleted_at": null,
@@ -327,16 +330,15 @@
                 configDt: {
                     url: "/api/pengabdian",
                     columns: [
-                        {title: "Pengabdian", data: "penelitian_judul", class: "all", printable: true},
+                        {title: "Pengabdian ", data: "penelitian_judul", class: "all", printable: true},
                         {title: "Anggaran", data: "penelitian_anggaran", class: "auto", printable: true},
                         {
-                            title: "Tahun Pelaksanaan",
-                            data: "penelitian_tahun_pelaksanaan",
+                            title: "Tanggal",
+                            data: "penelitian_tanggal",
                             class: "auto",
                             printable: true
                         },
-                        {title: "Status", data: "status.ss_value", class: "auto", printable: true},
-                        {title: "Tempat", data: "pengabdian_tempat", class: "auto", printable: true},
+                        {title: "Tempat", data: "pengabdian_tempat", class: "none", printable: true},
                         {title: "Ringkasan", data: "penelitian_ringkasan", class: "none", printable: true},
                         {
                             title: "Alasan(Jika Ditolak)",
@@ -344,10 +346,12 @@
                             class: "none",
                             printable: false
                         },
+                        {title: "Status", data: "status.ss_value", class: "auto", printable: true},
                         {title: "Action", data: "action", class: "text-center w-25 all", printable: false}
                     ]
                 },
-                list: []
+                list: [],
+                showSelect: false,
             }
         },
         created() {
@@ -374,7 +378,8 @@
                     .on("click", ".btn-anggota", function (e) {
                         e.preventDefault();
                         var id = $(this).data('id');
-                        vm.$router.push({path: `/penelitian/anggota/${id}`});
+                        vm.$router.push({path: `detail/pengabdian/${id}`});
+                        // vm.$router.push({path: `/pengabdian/anggota/${id}`});
                     })
                     .on("click", ".btn-edit", function (e) {
                         e.preventDefault();
@@ -391,17 +396,24 @@
                 this.$refs.dt.refresh();
             },
             create() {
+                this.anggota_id = [""];
                 this.data = _.cloneDeep(this.data2);
                 this.action = 'store';
                 this.modal_title = 'Tambah Pengabdian';
                 this.showModal = true;
             },
             edit(url) {
-                this.modal_title = 'Edit Pengabdian';
+                this.anggota_id = [];
+                this.showSelect = false;
+                this.modal_title = 'Edit Pengabdian ';
                 this.action = 'update';
                 this.axios.get(url).then(res => {
                     this.data = _.cloneDeep(res.data);
+                    res.data.data.penelitian_anggota.forEach(v=>{
+                        this.anggota_id.push(v.anggota_id);
+                    });
                 });
+                this.showSelect = true;
                 this.showModal = true;
             },
             updateStatus(url) {
@@ -415,10 +427,10 @@
             store() {
                 this.axios.post('/api/pengabdian', {
                     penelitian_judul: this.data.data.penelitian_judul,
-                    pengabdian_tempat: this.data.data.pengabdian_tempat,
                     penelitian_anggaran: this.data.data.penelitian_anggaran,
                     penelitian_ringkasan: this.data.data.penelitian_ringkasan,
-                    penelitian_tahun_pelaksanaan: this.data.data.penelitian_tahun_pelaksanaan,
+                    penelitian_tanggal: this.data.data.penelitian_tanggal,
+                    pengabdian_tempat: this.data.data.pengabdian_tempat,
                     anggota_id: this.anggota_id
                 }).then(res => {
                     if (res.data.status) {
@@ -436,7 +448,14 @@
                 });
             },
             update() {
-                this.axios.put(this.data.links.update, this.data.data).then(res => {
+                this.axios.put(this.data.links.update, {
+                    penelitian_judul: this.data.data.penelitian_judul,
+                    penelitian_anggaran: this.data.data.penelitian_anggaran,
+                    penelitian_ringkasan: this.data.data.penelitian_ringkasan,
+                    penelitian_tanggal: this.data.data.penelitian_tanggal,
+                    pengabdian_tempat: this.data.data.pengabdian_tempat,
+                    anggota_id: this.anggota_id
+                }).then(res => {
                     if (res.data.status) {
                         this.$message({
                             message: res.data.message,
@@ -497,7 +516,8 @@
                 this.axios.get(url).then(res => {
                     this.data = _.cloneDeep(res.data);
                     var id = _.cloneDeep(res.data.data.penelitian_id);
-                    this.uploadUrl = `/api/penelitian/${id}/upload`;
+                    this.uploadUrl = `/api/pengabdian/${id}/upload`;
+
                 });
                 this.showModalUpload = true;
             },
@@ -519,19 +539,21 @@
                 });
             },
             getData() {
-                this.axios.get('/api/select-options/anggota',{
+                this.showSelect = false;
+                this.axios.post('/api/select-options/anggota', {
                     anggota: this.anggota_id
                 }).then(res => {
                     this.anggota = res.data;
+                    this.showSelect = true;
                 });
             },
             addAnggotaId() {
                 this.anggota_id.push("");
-                this.getData();
+                // this.getData()
             },
             removeAnggotaId(index) {
                 this.anggota_id.splice(index, 1);
-                this.getData();
+                // this.getData();
             },
         },
         computed: {
