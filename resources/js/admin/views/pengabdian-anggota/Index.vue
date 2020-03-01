@@ -1,5 +1,5 @@
 <template>
-    <div :key="componentKey" v-if="showBegin">
+    <div>
         <el-breadcrumb separator="/" class="mb-3">
             <el-breadcrumb-item :to="{ path: '/dashboard' }">Dashboard</el-breadcrumb-item>
             <el-breadcrumb-item class="text-capitalize">{{type}}</el-breadcrumb-item>
@@ -55,86 +55,33 @@
                                         </td>
                                     </tr>
                                 </table>
+                               <div class="mt-3">
+                                   <h4>Anggota</h4>
+                                   <table class="table">
+                                       <thead>
+                                       <tr>
+                                           <th>Nama</th>
+                                           <th>NIP</th>
+                                           <th>Jabatan</th>
+                                           <!--<th>Golongan</th>-->
+                                           <th>Alamat</th>
+                                           <th>Telepon</th>
+                                       </tr>
+                                       </thead>
+                                       <tbody>
+                                       <tr v-for="(item, index) in data.data.penelitian_anggota" :key="index">
+                                           <td>{{ item.anggota.name }}</td>
+                                           <td>{{ item.anggota.nip }}</td>
+                                           <td>{{ item.anggota.jabatan }}</td>
+                                           <td><span v-html="item.anggota.alamat"></span></td>
+                                           <td>{{ item.anggota.phone }}</td>
+                                       </tr>
+                                       </tbody>
+                                   </table>
+                               </div>
                             </b-card-body>
                             <button v-if="data.data.status.ss_level == 1 && user.role == 'admin'" class="ml-auto btn btn-primary" @click="updateStatus">Ubah Status</button>
                             <button v-if="data.data.status.ss_level == 1 && user.role == 'user'" class="ml-auto btn btn-primary" @click="edit">Edit</button>
-                        </b-card>
-
-                        <b-card>
-                            <b-card-body>
-                                <div>
-                                    <h4>Anggota</h4>
-                                    <table class="table">
-                                        <thead>
-                                        <tr>
-                                            <th>Nama</th>
-                                            <th>NIP</th>
-                                            <th>Jabatan</th>
-                                            <!--<th>Golongan</th>-->
-                                            <th>Alamat</th>
-                                            <th>Telepon</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr v-for="(item, index) in data.data.penelitian_anggota" :key="index">
-                                            <td>{{ item.anggota.name }}</td>
-                                            <td>{{ item.anggota.nip }}</td>
-                                            <td>{{ item.anggota.jabatan }}</td>
-                                            <td><span v-html="item.anggota.alamat"></span></td>
-                                            <td>{{ item.anggota.phone }}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </b-card-body>
-                        </b-card>
-
-                        <b-card>
-                            <b-card-body>
-                                <h4>Proposal</h4>
-                                <div>
-                                    <div v-if="data.files.length > 0">
-                                        <ul class="list-group pr-3 pl-md-4">
-                                            <li class="list-group-item d-flex"
-                                                v-for="(item, index) in data.files"
-                                                :key="index">
-                                                <span class="fa fa-file-pdf-o fa-4x text-danger" v-if="item.data.file_ext == 'pdf'"></span>
-                                                <span class="fa fa-file-excel-o fa-4x text-success" v-else="item.data.file_ext == 'xlsx'"></span>
-                                                <button class="ml-3 btn btn-link text-info"
-                                                        @click="editFile(item)"
-                                                        v-if="item.mod.is_edit == false">{{item.data.file_title}}
-                                                </button>
-                                                <div class="ml-3" v-else>
-                                                    <b-form-group
-                                                            id="file_name-group"
-                                                            label="Edit Nama File"
-                                                            label-for="file_name"
-                                                    >
-                                                        <b-form-input id="file_name"
-                                                                      @change="updateFile"
-                                                                      v-model="item.data.file_title"
-                                                        ></b-form-input>
-                                                    </b-form-group>
-                                                </div>
-                                                <div class="ml-auto">
-                                                    <!-- <button class="btn btn-primary">
-                                                         <span class="fa fa-edit"></span>
-                                                     </button>-->
-                                                    <a :href="item.links.download" target="_blank" class="btn btn-primary">
-                                                        <span class="fa fa-download"></span>
-                                                    </a>
-                                                    <button class="btn btn-danger" @click="destroy(item)" v-if="user.role == 'user'">
-                                                        <span class="fa fa-trash-o"></span>
-                                                    </button>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div v-else>
-                                        <h4 class="text-center">Belum ada file diupload</h4>
-                                    </div>
-                                </div>
-                            </b-card-body>
                         </b-card>
                     </b-col>
                 </b-row>
@@ -291,7 +238,6 @@
 
 <script>
     var d = new Date();
-    import ListFile from '../penelitian/ListFile.vue';
     import DataTables from '../../components/base/DataTable';
     import MyEditor from "../../components/base/MyEditor";
     import MyMoney from "../../components/base/MyMoney";
@@ -305,7 +251,6 @@
             MyMoney,
             MyDatePicker,
             MyYearPicker,
-            ListFile
         },
         created() {
             this.getData();
@@ -326,15 +271,9 @@
                 year: d.getFullYear(),
                 anggota_id: [],
                 anggota: [],
-                componentKey: 1,
-                showBegin: false,
             }
         },
         methods: {
-            forceRerender() {
-                this.componentKey += 1;
-                this.$forceUpdate();
-            },
             addAnggotaId() {
                 this.anggota_id.push("");
                 // this.getData()
@@ -354,10 +293,8 @@
                     res.data.data.penelitian_anggota.forEach(v => {
                         vm.anggota_id.push(v.anggota_id);
                     });
-                    // console.log(vm.anggota_id);
-                });
-
-                this.showBegin = true;
+                    console.log(vm.anggota_id);
+                })
             },
             edit() {
                 this.modal_title = 'Edit Penelitian';
@@ -413,8 +350,6 @@
             refreshDt() {
                 this.getData();
             },
-            editFile(item) {
-            },
         },
         computed: {
             user() {
@@ -441,14 +376,16 @@
                 }
             }
         },
-        watch: {
-            "$route.params.penelitian_id": function(id) {
-                // this.showBegin = false;
-                // this.getData();
-                // this.forceRerender();
-                window.location.reload();
-                // react to route changes...
+        watch:{
+            penelitian_id(){
+                this.getData();
             },
+            watch: {
+                $route(to, from) {
+                    this.getData();
+                    // react to route changes...
+                }
+            }
         }
 
     }

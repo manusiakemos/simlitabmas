@@ -58,23 +58,10 @@
         methods: {
             routerPush(v) {
                 this.readMe(v);
-                // var current = this.$router.currentRoute;
                 var url = `/detail/${v.data.type}/${v.data.penelitian_id}`;
-                console.log(v.data, url);
                 this.$router.push({
                     path: url
                 });
-                // if(v.data.type == "pengabdian"){
-                //     var url = '/pengabdian';
-                //     if (current.path != '/pengabdian') {
-                //         this.$router.push({path: url});
-                //     }
-                // }else{
-                //     var url = '/penelitian';
-                //     if (current.path != '/penelitian') {
-                //         this.$router.push({path: url});
-                //     }
-                // }
             },
             readAll() {
                 this.axios.post('/api/pemberitahuan/readall').then(res=>{

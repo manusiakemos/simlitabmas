@@ -106,7 +106,7 @@ class PengabdianController extends Controller
      */
     public function edit($id)
     {
-        $data = Penelitian::with(['status', 'penelitian_anggota', 'penelitian_anggota.anggota'])->find($id);
+        $data = Penelitian::with(['files','status', 'penelitian_anggota', 'penelitian_anggota.anggota'])->find($id);
         return new PengabdianResource($data);
     }
 
@@ -221,12 +221,12 @@ class PengabdianController extends Controller
      */
     public function upload(Request $request, $id)
     {
-        $type = 'penelitian';
+        $type = 'pengabdian';
         $penelitian = Penelitian::find($id);
-        if ($penelitian->is_pengabdian == 1) {
-            $type = 'pengabdian';
-            $penelitian = Pengabdian::find($id);
-        }
+//        if ($penelitian->is_pengabdian == 1) {
+//            $type = 'pengabdian';
+//            $penelitian = Pengabdian::find($id);
+//        }
 
         $this->validate($request, [
             'file' => 'required|mimes:xls,xlsx,csv,pdf'

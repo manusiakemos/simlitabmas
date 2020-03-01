@@ -105,7 +105,7 @@ class PenelitianController extends Controller
      */
     public function edit($id)
     {
-        $data = Penelitian::with(['status', 'penelitian_anggota', 'penelitian_anggota.anggota'])->find($id);
+        $data = Penelitian::with(['status', 'files', 'penelitian_anggota', 'penelitian_anggota.anggota'])->find($id);
         return new PenelitianResource($data);
     }
 

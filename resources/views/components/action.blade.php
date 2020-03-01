@@ -164,7 +164,8 @@
                 Action
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="{{ $value['penelitian_id'] }}">
-
+                <button class="dropdown-item btn-anggota" data-id="{{ $value['penelitian_id'] }}">Detail
+                </button>
                 @if(auth()->user()->role == 'user')
                     <a class="dropdown-item btn-upload"
                        href="{{ route('pengabdian.edit', $value['penelitian_id']) }}">Proposal</a>
