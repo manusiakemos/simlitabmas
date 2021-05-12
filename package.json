@@ -34,7 +34,7 @@
         "bootstrap": "^4.3.1",
         "bootstrap-vue": "2.0.0-rc.24",
         "bootstrap-vue-datatable": "^1.0.7",
-        "chart.js": "^2.9.2",
+        "chart.js": "^2.9.4",
         "core-js": "^2.6.9",
         "css-vars-ponyfill": "^2.0.2",
         "datatables.net-bs4": "^1.10.20",
